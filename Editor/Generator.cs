@@ -101,7 +101,7 @@ namespace asmdef2pu
                 {
                     // Check Exclude options
                     {
-                        var _puAssembly = new PUAssembly(ssmblyRef);
+                        var _puAssembly = new PUAssembly(assmblyRef);
                         if (options.bIgnoreUnityAssemblyDependency)
                         {
                             if (_puAssembly.IsUnityAssembly)
