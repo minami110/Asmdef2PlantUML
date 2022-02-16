@@ -33,6 +33,8 @@ namespace asmdef2pu
         /// </summary>
         public bool bIgnoreAssemblyCSharp = true;
 
+        public List<string> ignoreDirectoryPatterns = new();
+
         #endregion
 
         #region Dependency Options

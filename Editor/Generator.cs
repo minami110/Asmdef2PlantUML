@@ -41,6 +41,23 @@ namespace asmdef2pu
             var assemblies = CompilationPipeline.GetAssemblies(AssembliesType.PlayerWithoutTestAssemblies);
             foreach (var assembly in assemblies)
             {
+                // Check User defined ignored pattern
+                {
+                    var _puAssembly = new PUAssembly(assembly);
+                    foreach (var excludePath in options.ignoreDirectoryPatterns)
+                    {
+                        var asmpath = _puAssembly.AsmdefPath;
+                        if (!string.IsNullOrEmpty(asmpath))
+                        {
+                            if (_puAssembly.AsmdefPath.Contains(excludePath))
+                            {
+                                // skip this assembly
+                                continue;
+                            }
+                        }
+                    }
+                }
+
                 // Make PlantUml Assembly
                 var puAssembly = GetPuAssembly(assembly);
 
@@ -86,6 +103,7 @@ namespace asmdef2pu
                 output += "' ----- Begin Assembly -----\n\n";
                 foreach (var pua in puAssemblies)
                 {
+
                     output += pua.Asm(options);
                 }
                 output += "\n' ----- End Assembly -----\n\n";
