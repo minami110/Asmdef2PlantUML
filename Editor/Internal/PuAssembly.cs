@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEditor.Compilation;
 
 namespace asmdef2pu
@@ -27,6 +28,23 @@ namespace asmdef2pu
         public string AsmdefPath { get; set; } = "";
         public string OutputPath { get; set; } = "";
         IEnumerable<IPuAssembly> IPuAssembly.Dependencies => _dependencies;
+        public bool IsUnityAssembly
+        {
+            get
+            {
+                string pattern = @"Unity.+";
+                var match = Regex.Match(Name, pattern);
+                return match.Success;
+            }
+        }
+
+        public bool IsAssemblyCSharp
+        {
+            get
+            {
+                return Name == "Assembly-CSharp";
+            }
+        }
 
         #endregion
 
@@ -71,6 +89,16 @@ namespace asmdef2pu
 
         #region Helper methods
 
+
+
+        public bool IsInPackage
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public bool AddDependency(IPuAssembly assembly)
         {
             if (_dependencies.Contains(assembly))
@@ -87,18 +115,14 @@ namespace asmdef2pu
 
             if (options.bIgnoreUnityAssembly)
             {
-                if (Name.Contains("Unity"))
-                {
+                if (IsUnityAssembly)
                     return result;
-                }
             }
 
             if (options.bIgnoreAssemblyCSharp)
             {
-                if (Name == "Assembly-CSharp")
-                {
+                if (IsAssemblyCSharp)
                     return result;
-                }
             }
 
             result += $"class \"{this.Name}\" << (A, orchid) >>" + " {\n";
@@ -131,18 +155,14 @@ namespace asmdef2pu
 
             if (options.bIgnoreUnityAssembly)
             {
-                if (Name.Contains("Unity"))
-                {
+                if (IsUnityAssembly)
                     return result;
-                }
             }
 
             if (options.bIgnoreAssemblyCSharp)
             {
-                if (Name == "Assembly-CSharp")
-                {
+                if (IsAssemblyCSharp)
                     return result;
-                }
             }
 
             foreach (var d in _dependencies)

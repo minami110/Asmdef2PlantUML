@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+
 using UnityEditor.Compilation;
 
 namespace asmdef2pu
@@ -97,18 +98,14 @@ namespace asmdef2pu
         {
             if (_options.bIgnoreUnityAssembly)
             {
-                if (assembly.Name.Contains("Unity"))
-                {
+                if (assembly.IsUnityAssembly)
                     return;
-                }
             }
 
             if (_options.bIgnoreAssemblyCSharp)
             {
-                if (assembly.Name == "Assembly-CSharp")
-                {
+                if (assembly.IsAssemblyCSharp)
                     return;
-                }
             }
 
             // Assembly 

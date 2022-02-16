@@ -8,5 +8,17 @@ namespace asmdef2pu
         public string AsmdefPath { get; }
         public string OutputPath { get; }
         public IEnumerable<IPuAssembly> Dependencies { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <value></value>
+        public bool IsUnityAssembly { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <value></value>
+        public bool IsAssemblyCSharp { get; }
     }
 }
