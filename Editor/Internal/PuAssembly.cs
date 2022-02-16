@@ -46,6 +46,22 @@ namespace asmdef2pu
             }
         }
 
+        public bool IsExistsInPackage
+        {
+            get
+            {
+                // Assembly-CSharp.dll null assigned
+                if (string.IsNullOrEmpty(AsmdefPath))
+                {
+                    return false;
+                }
+
+                string pattern = @"Packages.+";
+                var match = Regex.Match(AsmdefPath, pattern);
+                return match.Success;
+            }
+        }
+
         #endregion
 
         #region IPlantUmlResult impls
@@ -89,16 +105,6 @@ namespace asmdef2pu
 
         #region Helper methods
 
-
-
-        public bool IsInPackage
-        {
-            get
-            {
-                return true;
-            }
-        }
-
         public bool AddDependency(IPuAssembly assembly)
         {
             if (_dependencies.Contains(assembly))
@@ -112,6 +118,12 @@ namespace asmdef2pu
         public string Asm(ExportOptions options)
         {
             string result = "";
+
+            if (options.bIgnorePackageAssembly)
+            {
+                if (IsExistsInPackage)
+                    return result;
+            }
 
             if (options.bIgnoreUnityAssembly)
             {

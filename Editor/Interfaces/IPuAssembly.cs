@@ -20,5 +20,11 @@ namespace asmdef2pu
         /// </summary>
         /// <value></value>
         public bool IsAssemblyCSharp { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <value></value>
+        public bool IsExistsInPackage { get; }
     }
 }

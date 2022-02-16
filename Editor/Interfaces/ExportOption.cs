@@ -20,6 +20,11 @@ namespace asmdef2pu
         /// <summary>
         /// 
         /// </summary>
+        public bool bIgnorePackageAssembly = true;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public bool bIgnoreUnityAssembly = true;
 
 
@@ -41,6 +46,7 @@ namespace asmdef2pu
         /// 
         /// </summary>
         public bool bIgnoreUnityEngineUiDependency = true;
+
 
         #endregion
     }
