@@ -30,8 +30,7 @@ namespace asmdef2pu
         [MenuItem("Tools/Asmdef2PlantUML")]
         private static void ShowWindow()
         {
-            //既存のウィンドウのインスタンスを表示。ない場合は作成します。
-            var window = EditorWindow.GetWindow<Asmdef2PlantUmlWindow>();
+            var window = EditorWindow.GetWindow<Asmdef2PlantUmlWindow>(title: "Asmdef2PlantUML");
             window.Show();
         }
 
@@ -86,7 +85,7 @@ namespace asmdef2pu
             {
                 _scroll = EditorGUILayout.BeginScrollView(_scroll);
                 // Readonly TextArea hack
-                EditorGUILayout.SelectableLabel(_textResultPlantUml, EditorStyles.textArea, GUILayout.Height(position.height - 280));
+                EditorGUILayout.SelectableLabel(_textResultPlantUml, EditorStyles.textArea, GUILayout.Height(position.height - 350));
                 EditorGUILayout.EndScrollView();
             }
 
