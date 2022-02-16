@@ -1,2 +1,6 @@
 # asmdef2plantuml
-Unity .asmdef dependency PlantUML graph generator
+
+## Installation
+
+- Enter below url at UPM git package installation.
+- `https://github.com/minami110/asmdef2plantuml.git#<Version>`
