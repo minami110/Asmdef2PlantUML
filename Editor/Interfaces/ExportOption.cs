@@ -10,9 +10,38 @@ namespace asmdef2pu
 {
     internal class ExportOptions
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public bool bNestedNamespace = true;
+
+        #region Target Assembly Options
+
+        /// <summary>
+        /// 
+        /// </summary>
         public bool bIgnoreUnityAssembly = true;
+
+
+        /// <summary>
+        /// 
+        /// </summary>
         public bool bIgnoreAssemblyCSharp = true;
+
+        #endregion
+
+        #region Dependency Options
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool bIgnoreUnityAssemblyDependency = false;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public bool bIgnoreUnityEngineUiDependency = true;
+
+        #endregion
     }
 }

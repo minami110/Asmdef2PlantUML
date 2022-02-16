@@ -29,10 +29,11 @@ namespace asmdef2pu
             {
                 GUILayout.Label("Style Options", EditorStyles.boldLabel);
                 _options.bNestedNamespace = EditorGUILayout.ToggleLeft("Assembly 名のドット区切りで Namespace を作成", _options.bNestedNamespace);
-                GUILayout.Label("Assembly Options", EditorStyles.boldLabel);
+                GUILayout.Label("Target Options", EditorStyles.boldLabel);
                 _options.bIgnoreUnityAssembly = EditorGUILayout.ToggleLeft("Unity の Assembly は除く", _options.bIgnoreUnityAssembly);
                 _options.bIgnoreAssemblyCSharp = EditorGUILayout.ToggleLeft("Assembly-CSharp は除く", _options.bIgnoreAssemblyCSharp);
                 GUILayout.Label("Dependency Options", EditorStyles.boldLabel);
+                _options.bIgnoreUnityAssemblyDependency = EditorGUILayout.ToggleLeft("Unity の Assembly は依存元から除く", _options.bIgnoreUnityAssemblyDependency);
                 _options.bIgnoreUnityEngineUiDependency = EditorGUILayout.ToggleLeft("UnityEngine.UI への依存は注釈にする", _options.bIgnoreUnityEngineUiDependency);
             }
 

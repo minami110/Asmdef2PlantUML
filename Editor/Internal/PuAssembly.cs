@@ -167,11 +167,17 @@ namespace asmdef2pu
 
             foreach (var d in _dependencies)
             {
-                if (options.bIgnoreUnityEngineUiDependency)
+                if (options.bIgnoreUnityAssemblyDependency)
                 {
-                    if (d.Name == "UnityEngine.UI")
-                    {
+                    if (d.IsUnityAssembly)
                         continue;
+                }
+                else
+                {
+                    if (options.bIgnoreUnityEngineUiDependency)
+                    {
+                        if (d.Name == "UnityEngine.UI")
+                            continue;
                     }
                 }
                 result += $"\"{d.Name}\" <-- \"{this.Name}\"\n";
