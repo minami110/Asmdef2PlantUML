@@ -95,10 +95,20 @@ namespace asmdef2pu
                 // Make PlantUml Assembly
                 var puAssembly = GetPuAssembly(assembly);
 
-                // Add References
+                // Make Dependencies Assemblies
                 var assemblyRefs = assembly.assemblyReferences;
                 foreach (var assmblyRef in assemblyRefs)
                 {
+                    // Check Exclude options
+                    {
+                        var _puAssembly = new PUAssembly(assembly);
+                        if (options.bIgnoreUnityAssemblyDependency)
+                        {
+                            if (_puAssembly.IsUnityAssembly)
+                                continue;
+                        }
+                    }
+
                     // Make PlantUml Assembly
                     var puAssemblyRef = GetPuAssembly(assmblyRef);
 
