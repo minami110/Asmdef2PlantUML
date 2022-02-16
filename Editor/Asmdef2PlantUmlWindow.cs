@@ -15,7 +15,7 @@ namespace asmdef2pu
         Vector2 _scroll;
 
         [SerializeField]
-        private List<string> _無視するディレクトリのリスト = new() { "Assets/Plugins" };
+        private List<string> _無視するディレクトリのリスト = new();
 
         [MenuItem("Tools/Asmdef2PlantUML")]
         private static void ShowWindow()
