@@ -119,24 +119,6 @@ namespace asmdef2pu
         {
             string result = "";
 
-            if (options.bIgnorePackageAssembly)
-            {
-                if (IsExistsInPackage)
-                    return result;
-            }
-
-            if (options.bIgnoreUnityAssembly)
-            {
-                if (IsUnityAssembly)
-                    return result;
-            }
-
-            if (options.bIgnoreAssemblyCSharp)
-            {
-                if (IsAssemblyCSharp)
-                    return result;
-            }
-
             result += $"class \"{this.Name}\" << (A, orchid) >>" + " {\n";
             {
                 if (options.bIgnoreUnityEngineUiDependency)
@@ -164,24 +146,6 @@ namespace asmdef2pu
         public string Dep(ExportOptions options)
         {
             string result = "";
-
-            if (options.bIgnorePackageAssembly)
-            {
-                if (IsExistsInPackage)
-                    return result;
-            }
-
-            if (options.bIgnoreUnityAssembly)
-            {
-                if (IsUnityAssembly)
-                    return result;
-            }
-
-            if (options.bIgnoreAssemblyCSharp)
-            {
-                if (IsAssemblyCSharp)
-                    return result;
-            }
 
             foreach (var d in _dependencies)
             {

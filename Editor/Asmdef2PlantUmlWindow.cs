@@ -78,7 +78,6 @@ namespace asmdef2pu
             // Draw Generate Button
             if (GUILayout.Button("Generate PlantUML Text"))
             {
-                // こっちでだけ持ってるオプションがあるので 手動で入れる
                 _options.ignoreDirectoryPatterns = this._excludeDirectoryPattern;
                 _textResultPlantUml = Generator.Generate(_options);
             }

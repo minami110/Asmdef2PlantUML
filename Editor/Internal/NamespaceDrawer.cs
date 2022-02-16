@@ -86,28 +86,12 @@ namespace asmdef2pu
             #endregion
         }
 
-        readonly ExportOptions _options;
         readonly List<Namespace> _namespaceList = new();
 
-        internal NamespaceDrawer(ExportOptions options)
-        {
-            _options = options;
-        }
+        internal NamespaceDrawer() { }
 
         internal void Add(IPuAssembly assembly)
         {
-            if (_options.bIgnoreUnityAssembly)
-            {
-                if (assembly.IsUnityAssembly)
-                    return;
-            }
-
-            if (_options.bIgnoreAssemblyCSharp)
-            {
-                if (assembly.IsAssemblyCSharp)
-                    return;
-            }
-
             // Assembly 
             {
                 var sepName = assembly.Name.Split('.');

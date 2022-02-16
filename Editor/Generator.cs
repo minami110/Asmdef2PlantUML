@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.Compilation;
@@ -41,19 +42,52 @@ namespace asmdef2pu
             var assemblies = CompilationPipeline.GetAssemblies(AssembliesType.PlayerWithoutTestAssemblies);
             foreach (var assembly in assemblies)
             {
-                // Check User defined ignored pattern
+                // Check Options specified ignore patten
                 {
                     var _puAssembly = new PUAssembly(assembly);
-                    foreach (var excludePath in options.ignoreDirectoryPatterns)
+
+                    // Exclude Packages/ .asmdef
+                    if (options.bIgnorePackageAssembly)
                     {
-                        var asmpath = _puAssembly.AsmdefPath;
-                        if (!string.IsNullOrEmpty(asmpath))
+                        if (_puAssembly.IsExistsInPackage)
+                            continue;
+                    }
+
+                    // Exclude Unity .asmdef
+                    if (options.bIgnoreUnityAssembly)
+                    {
+                        if (_puAssembly.IsUnityAssembly)
+                            continue;
+                    }
+
+                    // Exclude Assembly-CSharp.dll
+                    if (options.bIgnoreAssemblyCSharp)
+                    {
+                        if (_puAssembly.IsAssemblyCSharp)
+                            continue;
+                    }
+
+                    // Check User defined ignored pattern
+                    if (options.ignoreDirectoryPatterns.Count > 0)
+                    {
+                        bool bExcluded = false;
+                        foreach (var pattern in options.ignoreDirectoryPatterns)
                         {
-                            if (_puAssembly.AsmdefPath.Contains(excludePath))
+                            var asmpath = _puAssembly.AsmdefPath;
+                            if (!string.IsNullOrEmpty(asmpath)) // Assembly-CSharp may be null
                             {
-                                // skip this assembly
-                                continue;
+                                var match = Regex.Match(asmpath, pattern);
+                                if (match.Success)
+                                {
+                                    bExcluded = true;
+                                    break;
+                                }
                             }
+                        }
+                        if (bExcluded)
+                        {
+                            // skip this assembly
+                            continue;
                         }
                     }
                 }
@@ -77,19 +111,12 @@ namespace asmdef2pu
             string output = "";
             output += "@startuml\n\n";
 
-            // PlantUml Options
-            {
-                output += "' ----- Begin PlantUML Options -----\n\n";
-
-                output += "\n' ----- End PlantUML Options -----\n\n";
-            }
-
             // Package Defines
             if (options.bNestedNamespace)
             {
                 output += "' ----- Begin Assembly Namespaces Definition -----\n\n";
 
-                var nsd = new NamespaceDrawer(options);
+                var nsd = new NamespaceDrawer();
                 foreach (var pua in puAssemblies)
                 {
                     nsd.Add(pua);
