@@ -165,6 +165,12 @@ namespace asmdef2pu
         {
             string result = "";
 
+            if (options.bIgnorePackageAssembly)
+            {
+                if (IsExistsInPackage)
+                    return result;
+            }
+
             if (options.bIgnoreUnityAssembly)
             {
                 if (IsUnityAssembly)

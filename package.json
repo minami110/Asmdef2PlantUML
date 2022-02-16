@@ -1,7 +1,7 @@
 {
     "name": "com.minami110.asmdef2plantuml",
     "description": "Unity .asmdef dependency PlantUML graph generator",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "displayName": "Asmdef2PlantUML",
     "unity": "2021.2",
     "author": {
