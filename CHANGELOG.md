@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.2.2] -
+
+- wip
+
 ## [0.2.1] - 2022-02-17
 
 - (Editor) Added options

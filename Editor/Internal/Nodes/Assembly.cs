@@ -85,6 +85,7 @@ namespace asmdef2pu.Internal
             _dependencies.Add(assembly);
         }
 
+        // FIXME: MoveDrawer
         public string Dep(ExportOptions options)
         {
             string result = "";
@@ -107,10 +108,10 @@ namespace asmdef2pu.Internal
                 switch (options.StyleOptions.DirectionStyle)
                 {
                     case DirectionStyle.BottomToTop:
-                        result += $"\"{d.Name}\" <-- \"{_name}\"" + "\n";
+                        result += $"\"{d.Name.Replace("-", "_")}\" <-- \"{_name.Replace("-", "_")}\"" + "\n";
                         break;
                     case DirectionStyle.TopToBottom:
-                        result += $"\"{_name}\" --> \"{d.Name}\"" + "\n";
+                        result += $"\"{_name.Replace("-", "_")}\" --> \"{d.Name.Replace("-", "_")}\"" + "\n";
                         break;
                     default:
                         break;

@@ -22,9 +22,9 @@ namespace asmdef2pu.Interfaces
         public bool bIgnoreUnityAssembly = true;
 
         /// <summary>
-        /// if true Exclude Assembly-CSharp.dll from the graph. (default: true)
+        /// if true Exclude Assembly-CSharp.dll from the graph. (default: false)
         /// </summary>
-        public bool bIgnoreAssemblyCSharp = true;
+        public bool bIgnoreAssemblyCSharp = false;
 
         /// <summary>
         /// A list of regular expression patterns to specify paths in ".asmdef" that you don't want included in the graph.

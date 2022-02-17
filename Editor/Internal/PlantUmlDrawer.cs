@@ -8,7 +8,7 @@ using asmdef2pu.Interfaces;
 
 namespace asmdef2pu.Internal
 {
-    class ComponentDrawer
+    class PlantUmlDrawer
     {
         readonly Dictionary<string, INode> _nodeMap = new();
 
@@ -95,6 +95,40 @@ namespace asmdef2pu.Internal
             throw new InvalidProgramException();
         }
 
+        string DrawPlantUmlComponent(INode node, ExportOptions options, int indent = 0)
+        {
+            var result = "";
+
+            // Calc indent tabs
+            var thisNest = "";
+            for (var i = 0; i < indent; i++)
+                thisNest += "\t";
+
+            // Convert name for Plant UML component 
+            // Foo-Bar => Foo_Bar
+            var componentName = node.FullName;
+            componentName = componentName.Replace("-", "_");
+
+            result += $"{thisNest}component {componentName} [\n";
+            result += $"{thisNest}\t{node.Name}\n";
+
+            // Draw comment
+            if (options.bHideUnityEngineDependency)
+            {
+                if (node is IAssembly assembly)
+                {
+                    if (assembly.IsDependentUnityEngine)
+                    {
+                        result += $"{thisNest}\t==\n";
+                        result += $"{thisNest}\t" + "Use UnityEngine" + "\n";
+                    }
+                }
+            }
+
+            result += $"{thisNest}]\n";
+            return result;
+        }
+
         internal string DrawComponents(ExportOptions options)
         {
             string result = "";
@@ -112,21 +146,7 @@ namespace asmdef2pu.Internal
                 // Root and Leaf node, draw component
                 if (node is IAssembly assembly)
                 {
-                    result += $"component {node.FullName} [\n";
-                    result += $"\t{node.Name}\n";
-
-                    // Draw comment
-
-                    if (options.bHideUnityEngineDependency)
-                    {
-                        if (assembly.IsDependentUnityEngine)
-                        {
-                            result += $"\t==\n";
-                            result += $"\t" + "Use UnityEngine" + "\n";
-                        }
-                    }
-
-                    result += "]\n";
+                    result += DrawPlantUmlComponent(node, options, 0);
                     continue;
                 }
 
@@ -170,18 +190,7 @@ namespace asmdef2pu.Internal
 
             if (node is IAssembly assembly)
             {
-                result += $"{thisNest}component {node.FullName} [\n";
-                result += $"{thisNest}\t{node.Name}\n";
-
-                if (options.bHideUnityEngineDependency)
-                {
-                    if (assembly.IsDependentUnityEngine)
-                    {
-                        result += $"{thisNest}\t==\n";
-                        result += $"{thisNest}\t" + "Use UnityEngine" + "\n";
-                    }
-                }
-                result += $"{thisNest}]\n";
+                result += DrawPlantUmlComponent(node, options, nest);
             }
             else
             {
