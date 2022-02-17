@@ -125,31 +125,15 @@ namespace asmdef2pu
             output += "\n";
 
             // Package Defines
-            if (options.bNestedNamespace)
+            output += "' ----- Begin Assembly Namespaces Definition -----\n\n";
+
+            var nsd = new NamespaceDrawer();
+            foreach (var pua in puAssemblies)
             {
-                output += "' ----- Begin Assembly Namespaces Definition -----\n\n";
-
-                var nsd = new NamespaceDrawer();
-                foreach (var pua in puAssemblies)
-                {
-                    nsd.Add(pua);
-                }
-                output += nsd.Draw();
-                output += "\n' ----- End Assembly Namespaces Definition -----\n\n";
+                nsd.Add(pua);
             }
-
-            // Assembly Defines
-            /*
-            {
-                output += "' ----- Begin Assembly -----\n\n";
-                foreach (var pua in puAssemblies)
-                {
-
-                    output += pua.Asm(options);
-                }
-                output += "\n' ----- End Assembly -----\n\n";
-            }
-            */
+            output += nsd.Draw();
+            output += "\n' ----- End Assembly Namespaces Definition -----\n\n";
 
             // Dependency Defines
             {

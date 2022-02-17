@@ -1,12 +1,27 @@
 #nullable enable
 
+using System;
 using System.Collections.Generic;
 
 namespace asmdef2pu.Interfaces
 {
+    [Serializable]
+    internal enum DirectionStyle : byte
+    {
+        TopToBottom,
+        BottomToTop
+    }
+
+    [Serializable]
+    internal class StyleOptions
+    {
+        public DirectionStyle DirectionStyle = DirectionStyle.TopToBottom;
+    }
+
     /// <summary>
     /// Options for the target assembly of the generated graph
     /// </summary>
+    [Serializable]
     internal class TargetAssemblyOptions
     {
         /// <summary>
@@ -36,11 +51,7 @@ namespace asmdef2pu.Interfaces
     /// </summary>
     internal class ExportOptions
     {
-        /// <summary>
-        /// Generate namespace from assembly name split by dot
-        /// e.g. Foo.Bar.dll => namespace Foo {}  
-        /// </summary>
-        public bool bNestedNamespace = true;
+        public StyleOptions StyleOptions = new();
 
         public TargetAssemblyOptions TargetAssemblyOptions = new();
 

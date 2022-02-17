@@ -10,15 +10,23 @@ namespace asmdef2pu.Internal
 {
     internal class PUAssembly : IPuAssembly, IPlantUmlResult, IEquatable<PUAssembly>
     {
-        private readonly List<IPuAssembly> _dependencies = new List<IPuAssembly>();
+        private readonly List<IPuAssembly> _dependencies = new();
 
         #region Constructors
 
-        public PUAssembly(Assembly assembly)
+
+        public PUAssembly(string name, string asmdefPath, string outputPath)
         {
-            Name = assembly.name;
-            AsmdefPath = CompilationPipeline.GetAssemblyDefinitionFilePathFromAssemblyName(assembly.name);
-            OutputPath = assembly.outputPath;
+            Name = name;
+            AsmdefPath = asmdefPath;
+            OutputPath = outputPath;
+        }
+
+        public PUAssembly(UnityEditor.Compilation.Assembly assembly)
+        {
+            Name = assembly.name ?? "";
+            AsmdefPath = CompilationPipeline.GetAssemblyDefinitionFilePathFromAssemblyName(assembly.name) ?? "";
+            OutputPath = assembly.outputPath ?? "";
         }
 
         #endregion
@@ -158,10 +166,17 @@ namespace asmdef2pu.Internal
                     }
                 }
                 // arrow direction style top or bottom
-                // top
-                // result += $"\"{d.Name}\" <-- \"{this.Name}\"" + "\n"; 
-                // bottom
-                result += $"\"{this.Name}\" --> \"{d.Name}\"" + "\n";
+                switch (options.StyleOptions.DirectionStyle)
+                {
+                    case DirectionStyle.BottomToTop:
+                        result += $"\"{d.Name}\" <-- \"{this.Name}\"" + "\n";
+                        break;
+                    case DirectionStyle.TopToBottom:
+                        result += $"\"{this.Name}\" --> \"{d.Name}\"" + "\n";
+                        break;
+                    default:
+                        break;
+                }
             }
             return result;
         }

@@ -33,6 +33,9 @@ namespace asmdef2pu
         [SerializeField]
         private List<string> _excludeDirectoryPattern = new() { "Assets/Plugins" };
 
+        [SerializeField]
+        private StyleOptions _styleOptions = new();
+
         [MenuItem("Tools/Asmdef2PlantUML")]
         private static void ShowWindow()
         {
@@ -50,7 +53,10 @@ namespace asmdef2pu
                 {
                     using (new EditorGUI.IndentLevelScope(1))
                     {
-                        _options.bNestedNamespace = EditorGUILayout.ToggleLeft("Assembly 名のドット区切りで Namespace を作成", _options.bNestedNamespace);
+                        ThisSerializedObject.Update();
+                        var property = ThisSerializedObject.FindProperty(nameof(_styleOptions));
+                        EditorGUILayout.PropertyField(property: property, label: new GUIContent("Style Options"), includeChildren: true);
+                        ThisSerializedObject.ApplyModifiedProperties();
                     }
                 }
                 EditorGUILayout.EndFoldoutHeaderGroup();
@@ -99,6 +105,7 @@ namespace asmdef2pu
             // Draw Generate Button
             if (GUILayout.Button("Generate PlantUML", GUILayout.Height(_oneLineHeight * 2))) // x2 larger
             {
+                _options.StyleOptions = this._styleOptions;
                 _options.TargetAssemblyOptions.ignoreDirectoryPatterns = this._excludeDirectoryPattern;
                 _textResultPlantUml = Generator.Generate(_options);
             }
