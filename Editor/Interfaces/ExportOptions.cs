@@ -44,6 +44,8 @@ namespace asmdef2pu.Interfaces
 
         #region Dependency Options
 
+        public bool bIgnorePackageAssemblyDependency = false;
+
         /// <summary>
         /// 
         /// </summary>

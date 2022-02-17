@@ -84,7 +84,12 @@ namespace asmdef2pu
 
             public bool IsDependencyTargetAssembly()
             {
-                // Check Exclude options
+                if (_options.bIgnorePackageAssemblyDependency)
+                {
+                    if ((this as IAssembly).IsExistsInPackage)
+                        return false;
+                }
+
                 if (_options.bIgnoreUnityAssemblyDependency)
                 {
                     if ((this as IAssembly).IsUnityTechnologiesAssembly)
