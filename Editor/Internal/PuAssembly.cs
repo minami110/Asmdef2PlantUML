@@ -4,8 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEditor.Compilation;
+using asmdef2pu.Interfaces;
 
-namespace asmdef2pu
+namespace asmdef2pu.Internal
 {
     internal class PUAssembly : IPuAssembly, IPlantUmlResult, IEquatable<PUAssembly>
     {

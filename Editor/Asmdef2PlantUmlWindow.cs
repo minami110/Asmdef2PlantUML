@@ -4,7 +4,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using UnityEditor.Compilation;
+using asmdef2pu.Interfaces;
+using asmdef2pu.Internal;
 
 namespace asmdef2pu
 {
@@ -47,10 +48,11 @@ namespace asmdef2pu
 
             // Target Options
             {
+                var targetOptions = _options.TargetAssemblyOptions;
                 GUILayout.Label("Target Options", EditorStyles.boldLabel);
-                _options.bIgnorePackageAssembly = EditorGUILayout.ToggleLeft("Package/ 以下の Assembly は除外", _options.bIgnorePackageAssembly);
-                _options.bIgnoreUnityAssembly = EditorGUILayout.ToggleLeft("Unity の Assembly は除外", _options.bIgnoreUnityAssembly);
-                _options.bIgnoreAssemblyCSharp = EditorGUILayout.ToggleLeft("Assembly-CSharp は除外", _options.bIgnoreAssemblyCSharp);
+                targetOptions.bIgnorePackageAssembly = EditorGUILayout.ToggleLeft("Package/ 以下の Assembly は除外", targetOptions.bIgnorePackageAssembly);
+                targetOptions.bIgnoreUnityAssembly = EditorGUILayout.ToggleLeft("Unity の Assembly は除外", targetOptions.bIgnoreUnityAssembly);
+                targetOptions.bIgnoreAssemblyCSharp = EditorGUILayout.ToggleLeft("Assembly-CSharp は除外", targetOptions.bIgnoreAssemblyCSharp);
 
                 // 除外リスト
                 {
@@ -77,7 +79,7 @@ namespace asmdef2pu
             // Draw Generate Button
             if (GUILayout.Button("Generate PlantUML Text"))
             {
-                _options.ignoreDirectoryPatterns = this._excludeDirectoryPattern;
+                _options.TargetAssemblyOptions.ignoreDirectoryPatterns = this._excludeDirectoryPattern;
                 _textResultPlantUml = Generator.Generate(_options);
             }
 

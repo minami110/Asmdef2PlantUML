@@ -3,9 +3,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using UnityEngine;
-using UnityEditor;
 using UnityEditor.Compilation;
+using asmdef2pu.Interfaces;
+using asmdef2pu.Internal;
 
 namespace asmdef2pu
 {
@@ -47,31 +47,31 @@ namespace asmdef2pu
                     var _puAssembly = new PUAssembly(assembly);
 
                     // Exclude Packages/ .asmdef
-                    if (options.bIgnorePackageAssembly)
+                    if (options.TargetAssemblyOptions.bIgnorePackageAssembly)
                     {
                         if (_puAssembly.IsExistsInPackage)
                             continue;
                     }
 
                     // Exclude Unity .asmdef
-                    if (options.bIgnoreUnityAssembly)
+                    if (options.TargetAssemblyOptions.bIgnoreUnityAssembly)
                     {
                         if (_puAssembly.IsUnityAssembly)
                             continue;
                     }
 
                     // Exclude Assembly-CSharp.dll
-                    if (options.bIgnoreAssemblyCSharp)
+                    if (options.TargetAssemblyOptions.bIgnoreAssemblyCSharp)
                     {
                         if (_puAssembly.IsAssemblyCSharp)
                             continue;
                     }
 
                     // Check User defined ignored pattern
-                    if (options.ignoreDirectoryPatterns.Count > 0)
+                    if (options.TargetAssemblyOptions.ignoreDirectoryPatterns.Count > 0)
                     {
                         bool bExcluded = false;
-                        foreach (var pattern in options.ignoreDirectoryPatterns)
+                        foreach (var pattern in options.TargetAssemblyOptions.ignoreDirectoryPatterns)
                         {
                             var asmpath = _puAssembly.AsmdefPath;
                             if (!string.IsNullOrEmpty(asmpath)) // Assembly-CSharp may be null

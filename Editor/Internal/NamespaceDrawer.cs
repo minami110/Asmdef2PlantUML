@@ -2,10 +2,9 @@
 
 using System;
 using System.Collections.Generic;
+using asmdef2pu.Interfaces;
 
-using UnityEditor.Compilation;
-
-namespace asmdef2pu
+namespace asmdef2pu.Internal
 {
     class NamespaceDrawer
     {

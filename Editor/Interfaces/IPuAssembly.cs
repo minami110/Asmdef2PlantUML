@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace asmdef2pu
+namespace asmdef2pu.Interfaces
 {
     internal interface IPuAssembly
     {
