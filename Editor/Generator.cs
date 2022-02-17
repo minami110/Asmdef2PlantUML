@@ -121,7 +121,17 @@ namespace asmdef2pu
             string output = "";
             output += "@startuml\n";
             output += "skinparam componentStyle uml1\n";
-            output += "skinparam linetype ortho\n";
+            switch (options.StyleOptions.LineStyle)
+            {
+                case LineStyle.Polyline:
+                    output += "skinparam linetype polyline\n";
+                    break;
+                case LineStyle.Ortho:
+                    output += "skinparam linetype ortho\n";
+                    break;
+                default:
+                    break;
+            }
             output += "\n";
 
             // Package Defines

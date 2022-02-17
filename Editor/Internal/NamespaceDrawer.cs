@@ -165,7 +165,7 @@ namespace asmdef2pu.Internal
                     /*
                     result += "==\n";
                     */
-                    result += "]";
+                    result += "]\n";
                 }
                 // Root but not Leaf node
                 else
