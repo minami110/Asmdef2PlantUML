@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.1] - 2022-02-17
+
+- (Editor) Added options
+- (PlantUML) Change class to component
+
 ## [0.2.0] - 2022-02-16
 
 - Added options
