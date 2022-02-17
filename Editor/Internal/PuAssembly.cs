@@ -39,13 +39,7 @@ namespace asmdef2pu.Internal
             }
         }
 
-        public bool IsAssemblyCSharp
-        {
-            get
-            {
-                return Name == "Assembly-CSharp";
-            }
-        }
+        public bool IsAssemblyCSharp => Name == Constants.AssemblyCSharpName;
 
         public bool IsExistsInPackage
         {
@@ -120,14 +114,14 @@ namespace asmdef2pu.Internal
         {
             string result = "";
 
-            result += $"class \"{this.Name}\" << (A, orchid) >>" + " {\n";
+            result += $"component \"{this.Name}\"" + " {\n";
             {
                 if (options.bIgnoreUnityEngineUiDependency)
                 {
                     bool bDependentUnityEngineUI = false;
                     foreach (var d in _dependencies)
                     {
-                        if (d.Name == "UnityEngine.UI")
+                        if (d.Name == Constants.UnityEngineUiName)
                         {
                             bDependentUnityEngineUI = true;
                             break;
@@ -163,7 +157,11 @@ namespace asmdef2pu.Internal
                             continue;
                     }
                 }
-                result += $"\"{d.Name}\" <-- \"{this.Name}\"\n";
+                // arrow direction style top or bottom
+                // top
+                // result += $"\"{d.Name}\" <-- \"{this.Name}\"" + "\n"; 
+                // bottom
+                result += $"\"{this.Name}\" --> \"{d.Name}\"" + "\n";
             }
             return result;
         }

@@ -15,6 +15,7 @@ namespace asmdef2pu.Internal
             readonly string _name;
 
             internal bool IsRoot => _parent is null;
+            internal bool IsLeaf => _children.Count == 0;
             internal IEnumerable<Namespace> Children => _children;
             internal string Name => _name;
 
@@ -95,18 +96,11 @@ namespace asmdef2pu.Internal
             {
                 var sepName = assembly.Name.Split('.');
                 var sepCount = sepName.Length;
-                // Has namespace
-                if (sepCount > 1)
+                if (sepCount > 0)
                 {
                     Namespace? parent = null;
                     for (int nest = 0; nest < sepCount; nest++)
                     {
-                        // LeafNode is skip
-                        if (nest == sepCount - 1)
-                        {
-                            continue;
-                        }
-
                         var ns = new Namespace(parent, sepName[nest]);
                         var index = _namespaceList.IndexOf(ns);
                         if (index > -1)
@@ -128,19 +122,11 @@ namespace asmdef2pu.Internal
                 {
                     var sepName = refas.Name.Split('.');
                     var sepCount = sepName.Length;
-                    // Has namespace
-                    if (sepCount > 1)
+                    if (sepCount > 0)
                     {
-
                         Namespace? parent = null;
                         for (int nest = 0; nest < sepCount; nest++)
                         {
-                            // LeafNode is skip
-                            if (nest == sepCount - 1)
-                            {
-                                continue;
-                            }
-
                             var ns = new Namespace(parent, sepName[nest]);
                             var index = _namespaceList.IndexOf(ns);
                             if (index > -1)
@@ -164,17 +150,33 @@ namespace asmdef2pu.Internal
 
             foreach (var ns in _namespaceList)
             {
+                // Skip not root node
                 if (!ns.IsRoot)
                 {
                     continue;
                 }
 
-                result += $"namespace {ns.Name}" + " {\n";
-                foreach (var nsc in ns.Children)
+                // Root and Leaf node, draw component
+                if (ns.IsLeaf)
                 {
-                    DrawChildNameSpace(ref result, nsc, 1);
+                    result += $"component {ns.FullName()} [\n";
+                    result += $"\t{ns.Name}\n";
+                    // Draw comment
+                    /*
+                    result += "==\n";
+                    */
+                    result += "]";
                 }
-                result += "}\n";
+                // Root but not Leaf node
+                else
+                {
+                    result += $"package {ns.Name}" + " {\n";
+                    foreach (var nsc in ns.Children)
+                    {
+                        DrawChildNameSpace(ref result, nsc, 1);
+                    }
+                    result += "}\n";
+                }
             }
 
             return result;
@@ -182,19 +184,31 @@ namespace asmdef2pu.Internal
 
         void DrawChildNameSpace(ref string result, Namespace child, int nest)
         {
+            var thisNest = "";
             for (var i = 0; i < nest; i++)
-                result += "\t";
+                thisNest += "\t";
 
-            result += $"namespace {child.Name}" + " {\n";
-
-            foreach (var nsc in child.Children)
+            if (child.IsLeaf)
             {
-                DrawChildNameSpace(ref result, nsc, nest + 1);
+                result += $"{thisNest}component {child.FullName()} [\n";
+                result += $"{thisNest}\t{child.Name}\n";
+                // Draw comment
+                /*
+                result += "==\n";
+                */
+                result += $"{thisNest}]\n";
             }
+            else
+            {
+                result += $"{thisNest}package {child.Name}" + " {\n";
 
-            for (var i = 0; i < nest; i++)
-                result += "\t";
-            result += "}\n";
+                foreach (var nsc in child.Children)
+                {
+                    DrawChildNameSpace(ref result, nsc, nest + 1);
+                }
+
+                result += $"{thisNest}" + "}\n";
+            }
         }
     }
 }
