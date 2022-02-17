@@ -24,6 +24,8 @@ namespace asmdef2pu
         ExportOptions _options = new();
         string _textResultPlantUml = "";
         Vector2 _scroll;
+        static readonly string _urlPlantuml = "https://plantuml.com/plantuml/uml/";
+        static readonly float _oneLineHeight = 20f;
 
         [SerializeField]
         private List<string> _excludeDirectoryPattern = new() { "Assets/Plugins" };
@@ -44,7 +46,7 @@ namespace asmdef2pu
                 _options.bNestedNamespace = EditorGUILayout.ToggleLeft("Assembly 名のドット区切りで Namespace を作成", _options.bNestedNamespace);
             }
 
-            GUILayout.Space(10);
+            GUILayout.Space(_oneLineHeight);
 
             // Target Options
             {
@@ -63,7 +65,7 @@ namespace asmdef2pu
                 }
             }
 
-            GUILayout.Space(10);
+            GUILayout.Space(_oneLineHeight);
 
             // Dependency Options
             {
@@ -74,7 +76,7 @@ namespace asmdef2pu
 
             }
 
-            GUILayout.Space(10);
+            GUILayout.Space(_oneLineHeight);
 
             // Draw Generate Button
             if (GUILayout.Button("Generate PlantUML Text"))
@@ -84,17 +86,27 @@ namespace asmdef2pu
             }
 
             // Scrollable Text Area
+            using (var s = new EditorGUILayout.ScrollViewScope(_scroll))
             {
-                _scroll = EditorGUILayout.BeginScrollView(_scroll);
+                _scroll = s.scrollPosition;
                 // Readonly TextArea hack
                 EditorGUILayout.SelectableLabel(_textResultPlantUml, EditorStyles.textArea, GUILayout.Height(position.height - 350));
-                EditorGUILayout.EndScrollView();
             }
 
             // Copy Text Button
             if (GUILayout.Button("Copy to clipboard"))
             {
                 EditorGUIUtility.systemCopyBuffer = _textResultPlantUml;
+            }
+
+            // Web Jump
+            using (new EditorGUILayout.HorizontalScope())
+            {
+                EditorGUILayout.SelectableLabel(_urlPlantuml, EditorStyles.textField, GUILayout.Height(_oneLineHeight));
+                if (GUILayout.Button("Open URL"))
+                {
+                    Application.OpenURL(_urlPlantuml);
+                }
             }
         }
     }
