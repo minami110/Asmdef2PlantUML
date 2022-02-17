@@ -52,7 +52,7 @@ namespace asmdef2pu.Interfaces
         /// <summary>
         /// 
         /// </summary>
-        public bool bIgnoreUnityEngineUiDependency = true;
+        public bool bHideUnityEngineDependency = true;
 
 
         #endregion

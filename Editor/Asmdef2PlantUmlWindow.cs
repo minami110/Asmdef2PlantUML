@@ -94,7 +94,7 @@ namespace asmdef2pu
                     using (new EditorGUI.IndentLevelScope(1))
                     {
                         _options.bIgnoreUnityAssemblyDependency = EditorGUILayout.ToggleLeft("Unity の Assembly は依存元から除く", _options.bIgnoreUnityAssemblyDependency);
-                        _options.bIgnoreUnityEngineUiDependency = EditorGUILayout.ToggleLeft("UnityEngine.UI への依存は注釈にする", _options.bIgnoreUnityEngineUiDependency);
+                        _options.bHideUnityEngineDependency = EditorGUILayout.ToggleLeft("UnityEngine.UI への依存は注釈にする", _options.bHideUnityEngineDependency);
                     }
                 }
                 EditorGUILayout.EndFoldoutHeaderGroup();

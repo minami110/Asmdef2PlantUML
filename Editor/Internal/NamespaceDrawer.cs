@@ -115,7 +115,7 @@ namespace asmdef2pu.Internal
 
                     // Draw comment
 
-                    if (options.bIgnoreUnityEngineUiDependency)
+                    if (options.bHideUnityEngineDependency)
                     {
                         if (assembly.IsDependentUnityEngine)
                         {
@@ -171,7 +171,7 @@ namespace asmdef2pu.Internal
                 result += $"{thisNest}component {node.FullName} [\n";
                 result += $"{thisNest}\t{node.Name}\n";
 
-                if (options.bIgnoreUnityEngineUiDependency)
+                if (options.bHideUnityEngineDependency)
                 {
                     if (assembly.IsDependentUnityEngine)
                     {

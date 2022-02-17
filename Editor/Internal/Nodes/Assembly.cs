@@ -93,14 +93,13 @@ namespace asmdef2pu.Internal
                     if (d.IsUnityTechnologiesAssembly)
                         continue;
                 }
-                else
+
+                if (options.bHideUnityEngineDependency)
                 {
-                    if (options.bIgnoreUnityEngineUiDependency)
-                    {
-                        if (d.Name == Constants.UnityEngineUiName)
-                            continue;
-                    }
+                    if (d.Name == Constants.UnityEngineUiName)
+                        continue;
                 }
+
                 // arrow direction style top or bottom
                 switch (options.StyleOptions.DirectionStyle)
                 {
