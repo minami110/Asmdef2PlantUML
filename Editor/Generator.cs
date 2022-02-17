@@ -11,109 +11,119 @@ namespace asmdef2pu
 {
     static class Generator
     {
-        internal static string Generate(ExportOptions options)
+        class AssemblyChecker : IAssembly
         {
-            // PlantUml Assembly Cache
-            var puAssemblies = new List<PUAssembly>();
+            readonly UnityEditor.Compilation.Assembly _unityAssembly;
+            readonly ExportOptions _options;
 
-            // local functions
-            PUAssembly GetPuAssembly(Assembly assembly)
+            public AssemblyChecker(UnityEditor.Compilation.Assembly unityAssembly, ExportOptions options)
             {
-                // Make PlantUml Assembly
-                var puAssembly = new PUAssembly(assembly);
-
-                // Already existed in cache use it
-                {
-                    var index = puAssemblies.IndexOf(puAssembly);
-                    if (index > -1)
-                    {
-                        puAssembly = puAssemblies[index];
-                    }
-                    else
-                    {
-                        puAssemblies.Add(puAssembly);
-                    }
-                }
-
-                return puAssembly;
+                _unityAssembly = unityAssembly;
+                _options = options;
             }
 
-            // Player Build included only (Excluded test assembly)
-            var assemblies = CompilationPipeline.GetAssemblies(AssembliesType.PlayerWithoutTestAssemblies);
-            foreach (var assembly in assemblies)
+            #region IAssembly impls
+
+            string IAssembly.Name => _unityAssembly.name ?? "";
+            string IAssembly.AsmdefPath => CompilationPipeline.GetAssemblyDefinitionFilePathFromAssemblyName(_unityAssembly.name) ?? "";
+            IEnumerable<IAssembly> IAssembly.Dependencies => new IAssembly[0];
+
+            #endregion
+
+            public bool IsTargetAssembly()
             {
-                // Check Options specified ignore patten
+                // Exclude Packages/ .asmdef
+                if (_options.TargetAssemblyOptions.bIgnorePackageAssembly)
                 {
-                    var _puAssembly = new PUAssembly(assembly);
+                    if ((this as IAssembly).IsExistsInPackage)
+                        return false;
+                }
 
-                    // Exclude Packages/ .asmdef
-                    if (options.TargetAssemblyOptions.bIgnorePackageAssembly)
-                    {
-                        if (_puAssembly.IsExistsInPackage)
-                            continue;
-                    }
+                // Exclude Unity .asmdef
+                if (_options.TargetAssemblyOptions.bIgnoreUnityAssembly)
+                {
+                    if ((this as IAssembly).IsUnityTechnologiesAssembly)
+                        return false;
+                }
 
-                    // Exclude Unity .asmdef
-                    if (options.TargetAssemblyOptions.bIgnoreUnityAssembly)
-                    {
-                        if (_puAssembly.IsUnityAssembly)
-                            continue;
-                    }
+                // Exclude Assembly-CSharp.dll
+                if (_options.TargetAssemblyOptions.bIgnoreAssemblyCSharp)
+                {
+                    if ((this as IAssembly).IsAssemblyCSharp)
+                        return false;
+                }
 
-                    // Exclude Assembly-CSharp.dll
-                    if (options.TargetAssemblyOptions.bIgnoreAssemblyCSharp)
+                // Check User defined ignored pattern
+                if (_options.TargetAssemblyOptions.ignoreDirectoryPatterns.Count > 0)
+                {
+                    bool bExcluded = false;
+                    foreach (var pattern in _options.TargetAssemblyOptions.ignoreDirectoryPatterns)
                     {
-                        if (_puAssembly.IsAssemblyCSharp)
-                            continue;
-                    }
-
-                    // Check User defined ignored pattern
-                    if (options.TargetAssemblyOptions.ignoreDirectoryPatterns.Count > 0)
-                    {
-                        bool bExcluded = false;
-                        foreach (var pattern in options.TargetAssemblyOptions.ignoreDirectoryPatterns)
+                        var asmpath = (this as IAssembly).AsmdefPath;
+                        if (!string.IsNullOrEmpty(asmpath)) // Assembly-CSharp may be null
                         {
-                            var asmpath = _puAssembly.AsmdefPath;
-                            if (!string.IsNullOrEmpty(asmpath)) // Assembly-CSharp may be null
+                            var match = Regex.Match(asmpath, pattern);
+                            if (match.Success)
                             {
-                                var match = Regex.Match(asmpath, pattern);
-                                if (match.Success)
-                                {
-                                    bExcluded = true;
-                                    break;
-                                }
+                                bExcluded = true;
+                                break;
                             }
                         }
-                        if (bExcluded)
-                        {
-                            // skip this assembly
-                            continue;
-                        }
+                    }
+                    if (bExcluded)
+                    {
+                        // skip this assembly
+                        return false;
                     }
                 }
 
-                // Make PlantUml Assembly
-                var puAssembly = GetPuAssembly(assembly);
+                return true;
+            }
+
+            public bool IsDependencyTargetAssembly()
+            {
+                // Check Exclude options
+                if (_options.bIgnoreUnityAssemblyDependency)
+                {
+                    if ((this as IAssembly).IsUnityTechnologiesAssembly)
+                        return false;
+                }
+
+                return true;
+            }
+        }
+
+        internal static string Generate(ExportOptions options)
+        {
+            // Make Drawer
+            var drawer = new ComponentDrawer();
+
+            // Gather Unity Assemblies
+            // Player Build included only (Excluded test assembly)
+            var assemblies = CompilationPipeline.GetAssemblies(AssembliesType.PlayerWithoutTestAssemblies);
+            foreach (var unityAssembly in assemblies)
+            {
+                IAssembly targetAssembly;
+                {
+                    var checker = new AssemblyChecker(unityAssembly, options);
+                    if (!checker.IsTargetAssembly())
+                    {
+                        continue;
+                    }
+                    // Add Drawer
+                    targetAssembly = drawer.Add(unityAssembly);
+                }
 
                 // Make Dependencies Assemblies
-                var assemblyRefs = assembly.assemblyReferences;
+                var assemblyRefs = unityAssembly.assemblyReferences;
                 foreach (var assmblyRef in assemblyRefs)
                 {
-                    // Check Exclude options
+                    var checker = new AssemblyChecker(assmblyRef, options);
+                    if (checker.IsDependencyTargetAssembly())
                     {
-                        var _puAssembly = new PUAssembly(assmblyRef);
-                        if (options.bIgnoreUnityAssemblyDependency)
-                        {
-                            if (_puAssembly.IsUnityAssembly)
-                                continue;
-                        }
+                        // Add Drawer
+                        drawer.AddDependency(targetAssembly, assmblyRef);
                     }
-
-                    // Make PlantUml Assembly
-                    var puAssemblyRef = GetPuAssembly(assmblyRef);
-
-                    // Add Reference
-                    puAssembly.AddDependency(puAssemblyRef);
                 }
             }
 
@@ -136,24 +146,13 @@ namespace asmdef2pu
 
             // Package Defines
             output += "' ----- Begin Assembly Namespaces Definition -----\n\n";
-
-            var nsd = new NamespaceDrawer();
-            foreach (var pua in puAssemblies)
-            {
-                nsd.Add(pua);
-            }
-            output += nsd.Draw();
+            output += drawer.DrawComponents(options);
             output += "\n' ----- End Assembly Namespaces Definition -----\n\n";
 
             // Dependency Defines
-            {
-                output += "' ----- Begin Dependencies -----\n\n";
-                foreach (var pua in puAssemblies)
-                {
-                    output += pua.Dep(options);
-                }
-                output += "\n' ----- End Dependencies -----\n\n";
-            }
+            output += "' ----- Begin Dependencies -----\n\n";
+            output += drawer.DrawDependencies(options);
+            output += "\n' ----- End Dependencies -----\n\n";
 
             output += "\n@enduml";
 

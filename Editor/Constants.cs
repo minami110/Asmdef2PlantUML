@@ -1,6 +1,6 @@
 #nullable enable
 
-namespace asmdef2pu.Internal
+namespace asmdef2pu
 {
     internal static class Constants
     {

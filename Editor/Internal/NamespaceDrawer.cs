@@ -2,178 +2,138 @@
 
 using System;
 using System.Collections.Generic;
+using UnityEditor.Compilation;
 using asmdef2pu.Interfaces;
 
 namespace asmdef2pu.Internal
 {
-    class NamespaceDrawer
+    class ComponentDrawer
     {
-        class Namespace : IEquatable<Namespace>
+        readonly Dictionary<string, INode> _nodeMap = new();
+
+        internal IAssembly Add(UnityEditor.Compilation.Assembly unityAssembly)
         {
-            readonly Namespace? _parent;
-            readonly List<Namespace> _children = new();
-            readonly string _name;
+            // Get info from Unity assembly
+            var assemblyName = unityAssembly.name ?? "";
+            var asmdefPath = CompilationPipeline.GetAssemblyDefinitionFilePathFromAssemblyName(unityAssembly.name) ?? "";
 
-            internal bool IsRoot => _parent is null;
-            internal bool IsLeaf => _children.Count == 0;
-            internal IEnumerable<Namespace> Children => _children;
-            internal string Name => _name;
+            return CreateOrGetAssembly(assemblyName, asmdefPath);
+        }
 
-            void SetChild(Namespace ns)
+        internal void AddDependency(IAssembly target, UnityEditor.Compilation.Assembly unityAssembly)
+        {
+            if (_nodeMap.ContainsKey(target.Name))
             {
-                if (!_children.Contains(ns))
-                    _children.Add(ns);
+                // Create dependncy assembly
+                var dep = Add(unityAssembly);
+
+                // Add Reference
+                ((Assembly)_nodeMap[target.Name]).AddDependency(dep);
             }
+        }
 
-            public string FullName()
-            {
-                CollectFullNameRecuesive(out string result);
-                return result;
-            }
+        private IAssembly CreateOrGetAssembly(string name, string filePath)
+        {
+            // Split Names
+            // Foo.Bar.Baz => {"Foo", "Bar", "Baz"}
+            var sep = ".";
+            var sepName = name.Split(sep);
+            var sepCount = sepName.Length;
+            Scope? parent = null;
+            string currentId = "";
 
-            void CollectFullNameRecuesive(out string result)
+            for (int level = 0; level < sepCount; level++)
             {
-                if (_parent is not null)
+                // Update currentId
+                // Foo -> Foo.Bar -> Foo.Bar.Baz
+                if (level == 0)
                 {
-                    _parent.CollectFullNameRecuesive(out result);
-                    result += $".{_name}";
+                    currentId += sepName[level];
                 }
                 else
                 {
-                    result = $"{_name}";
+                    currentId += sep + sepName[level];
                 }
-            }
 
-            internal Namespace(Namespace? parent, string name)
-            {
-                _parent = parent;
-                _name = name;
-
-                if (parent is not null)
+                // Final level make assembly
+                if (level == sepCount - 1)
                 {
-                    parent.SetChild(this);
-                }
-            }
-
-            #region IEquatable impls
-            public override bool Equals(object? obj) => this.Equals(obj as Namespace);
-            public bool Equals(Namespace? p)
-            {
-                if (p is null)
-                    return false;
-                if (System.Object.ReferenceEquals(this, p))
-                    return true;
-                if (this.GetType() != p.GetType())
-                    return false;
-                return FullName() == p.FullName();
-            }
-            public override int GetHashCode() => FullName().GetHashCode();
-            public static bool operator ==(Namespace? lhs, Namespace? rhs)
-            {
-                if (lhs is null)
-                {
-                    if (rhs is null)
-                        return true;
-                    // Only the left side is null.
-                    return false;
-                }
-                // Equals handles case of null on right side.
-                return lhs.Equals(rhs);
-            }
-
-            public static bool operator !=(Namespace? lhs, Namespace? rhs) => !(lhs == rhs);
-
-            #endregion
-        }
-
-        readonly List<Namespace> _namespaceList = new();
-
-        internal NamespaceDrawer() { }
-
-        internal void Add(IPuAssembly assembly)
-        {
-            // Assembly 
-            {
-                var sepName = assembly.Name.Split('.');
-                var sepCount = sepName.Length;
-                if (sepCount > 0)
-                {
-                    Namespace? parent = null;
-                    for (int nest = 0; nest < sepCount; nest++)
+                    // If already cached, do not anything
+                    if (_nodeMap.ContainsKey(currentId))
                     {
-                        var ns = new Namespace(parent, sepName[nest]);
-                        var index = _namespaceList.IndexOf(ns);
-                        if (index > -1)
-                        {
-                            ns = _namespaceList[index];
-                        }
-                        else
-                        {
-                            _namespaceList.Add(ns);
-                        }
-                        parent = ns;
+                        return (Assembly)_nodeMap[currentId];
+                    }
+                    else
+                    {
+                        var asmb = new Assembly(currentId, parent, filePath);
+                        _nodeMap.Add(currentId, asmb);
+                        return asmb;
                     }
                 }
-            }
-
-            // References
-            {
-                foreach (var refas in assembly.Dependencies)
+                // Other levels make scope
+                else
                 {
-                    var sepName = refas.Name.Split('.');
-                    var sepCount = sepName.Length;
-                    if (sepCount > 0)
+                    Scope scope;
+                    // If already cached, use this one
+                    if (_nodeMap.ContainsKey(currentId))
                     {
-                        Namespace? parent = null;
-                        for (int nest = 0; nest < sepCount; nest++)
-                        {
-                            var ns = new Namespace(parent, sepName[nest]);
-                            var index = _namespaceList.IndexOf(ns);
-                            if (index > -1)
-                            {
-                                ns = _namespaceList[index];
-                            }
-                            else
-                            {
-                                _namespaceList.Add(ns);
-                            }
-                            parent = ns;
-                        }
+                        scope = (Scope)_nodeMap[currentId];
                     }
+                    // Not exists in cache, create new one
+                    else
+                    {
+                        scope = new Scope(sepName[level], parent);
+                        _nodeMap.Add(currentId, scope);
+                    }
+                    // Update parent
+                    parent = scope;
                 }
             }
+
+            throw new InvalidProgramException();
         }
 
-        internal string Draw()
+        internal string DrawComponents(ExportOptions options)
         {
             string result = "";
 
-            foreach (var ns in _namespaceList)
+            foreach (var pair in _nodeMap)
             {
+                var node = pair.Value;
+
                 // Skip not root node
-                if (!ns.IsRoot)
+                if (!node.IsRoot)
                 {
                     continue;
                 }
 
                 // Root and Leaf node, draw component
-                if (ns.IsLeaf)
+                if (node is IAssembly assembly)
                 {
-                    result += $"component {ns.FullName()} [\n";
-                    result += $"\t{ns.Name}\n";
+                    result += $"component {node.FullName} [\n";
+                    result += $"\t{node.Name}\n";
+
                     // Draw comment
-                    /*
-                    result += "==\n";
-                    */
-                    result += "]\n";
-                }
-                // Root but not Leaf node
-                else
-                {
-                    result += $"package {ns.Name}" + " {\n";
-                    foreach (var nsc in ns.Children)
+
+                    if (options.bIgnoreUnityEngineUiDependency)
                     {
-                        DrawChildNameSpace(ref result, nsc, 1);
+                        if (assembly.IsDependentUnityEngine)
+                        {
+                            result += $"\t==\n";
+                            result += $"\t" + "Use UnityEngine" + "\n";
+                        }
+                    }
+
+                    result += "]\n";
+                    continue;
+                }
+
+                if (node is Scope scope)
+                {
+                    result += $"package {node.Name}" + " {\n";
+                    foreach (var nsc in node.Children)
+                    {
+                        DrawChildNameSpace(ref result, nsc, 1, options);
                     }
                     result += "}\n";
                 }
@@ -182,29 +142,52 @@ namespace asmdef2pu.Internal
             return result;
         }
 
-        void DrawChildNameSpace(ref string result, Namespace child, int nest)
+        internal string DrawDependencies(ExportOptions option)
+        {
+            string result = "";
+
+            foreach (var pair in _nodeMap)
+            {
+                var node = pair.Value;
+
+                // Root and Leaf node, draw component
+                if (node is Assembly assembly)
+                {
+                    result += assembly.Dep(option);
+                }
+            }
+
+            return result;
+        }
+
+        void DrawChildNameSpace(ref string result, INode node, int nest, ExportOptions options)
         {
             var thisNest = "";
             for (var i = 0; i < nest; i++)
                 thisNest += "\t";
 
-            if (child.IsLeaf)
+            if (node is IAssembly assembly)
             {
-                result += $"{thisNest}component {child.FullName()} [\n";
-                result += $"{thisNest}\t{child.Name}\n";
-                // Draw comment
-                /*
-                result += "==\n";
-                */
+                result += $"{thisNest}component {node.FullName} [\n";
+                result += $"{thisNest}\t{node.Name}\n";
+
+                if (options.bIgnoreUnityEngineUiDependency)
+                {
+                    if (assembly.IsDependentUnityEngine)
+                    {
+                        result += $"{thisNest}\t==\n";
+                        result += $"{thisNest}\t" + "Use UnityEngine" + "\n";
+                    }
+                }
                 result += $"{thisNest}]\n";
             }
             else
             {
-                result += $"{thisNest}package {child.Name}" + " {\n";
+                result += $"{thisNest}package {node.FullName}" + $" as \"{node.Name}\"" + " {\n";
 
-                foreach (var nsc in child.Children)
+                foreach (var nsc in node.Children)
                 {
-                    DrawChildNameSpace(ref result, nsc, nest + 1);
+                    DrawChildNameSpace(ref result, nsc, nest + 1, options);
                 }
 
                 result += $"{thisNest}" + "}\n";
