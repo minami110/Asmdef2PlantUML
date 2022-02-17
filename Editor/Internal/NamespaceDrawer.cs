@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor.Compilation;
 using asmdef2pu.Interfaces;
 
@@ -16,8 +17,9 @@ namespace asmdef2pu.Internal
             // Get info from Unity assembly
             var assemblyName = unityAssembly.name ?? "";
             var asmdefPath = CompilationPipeline.GetAssemblyDefinitionFilePathFromAssemblyName(unityAssembly.name) ?? "";
+            var dependencies = unityAssembly.assemblyReferences;
 
-            return CreateOrGetAssembly(assemblyName, asmdefPath);
+            return CreateOrGetAssembly(assemblyName, asmdefPath, dependencies.Any(d => d.name == Constants.UnityEngineUiName));
         }
 
         internal void AddDependency(IAssembly target, UnityEditor.Compilation.Assembly unityAssembly)
@@ -32,7 +34,7 @@ namespace asmdef2pu.Internal
             }
         }
 
-        private IAssembly CreateOrGetAssembly(string name, string filePath)
+        private IAssembly CreateOrGetAssembly(string name, string filePath, bool isDependentUnityEngine)
         {
             // Split Names
             // Foo.Bar.Baz => {"Foo", "Bar", "Baz"}
@@ -65,7 +67,7 @@ namespace asmdef2pu.Internal
                     }
                     else
                     {
-                        var asmb = new Assembly(currentId, parent, filePath);
+                        var asmb = new Assembly(currentId, parent, filePath, isDependentUnityEngine);
                         _nodeMap.Add(currentId, asmb);
                         return asmb;
                     }

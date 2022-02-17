@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Linq;
 using UnityEditor.Compilation;
 using asmdef2pu.Interfaces;
 using asmdef2pu.Internal;
@@ -27,6 +28,7 @@ namespace asmdef2pu
             string IAssembly.Name => _unityAssembly.name ?? "";
             string IAssembly.AsmdefPath => CompilationPipeline.GetAssemblyDefinitionFilePathFromAssemblyName(_unityAssembly.name) ?? "";
             IEnumerable<IAssembly> IAssembly.Dependencies => new IAssembly[0];
+            bool IAssembly.IsDependentUnityEngine => false;
 
             #endregion
 

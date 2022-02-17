@@ -50,7 +50,9 @@ namespace asmdef2pu.Interfaces
             }
         }
 
-        public bool IsDependentUnityEngine => Dependencies.Any(d => d.Name == Constants.UnityEngineUiName);
+        public bool IsUnityEngineUi => Name == Constants.UnityEngineUiName;
+
+        public bool IsDependentUnityEngine { get; }
 
     }
 }

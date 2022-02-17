@@ -13,14 +13,16 @@ namespace asmdef2pu.Internal
         private readonly string _name;
         private readonly string _asmdefPath;
         private readonly Scope? _parent;
+        private readonly bool _isDependentUnityEngine;
 
         #region Constructors
 
-        public Assembly(string name, Scope? parent, string asmdefPath)
+        public Assembly(string name, Scope? parent, string asmdefPath, bool isDependentUnityEngine)
         {
             _name = name;
             _parent = parent;
             _asmdefPath = asmdefPath;
+            _isDependentUnityEngine = isDependentUnityEngine;
 
             // Add Parent to this
             if (parent is not null)
@@ -36,6 +38,7 @@ namespace asmdef2pu.Internal
         string IAssembly.Name => _name;
         string IAssembly.AsmdefPath => _asmdefPath;
         IEnumerable<IAssembly> IAssembly.Dependencies => _dependencies;
+        bool IAssembly.IsDependentUnityEngine => _isDependentUnityEngine;
 
         #endregion
 
@@ -96,7 +99,7 @@ namespace asmdef2pu.Internal
 
                 if (options.bHideUnityEngineDependency)
                 {
-                    if (d.Name == Constants.UnityEngineUiName)
+                    if (d.IsUnityEngineUi)
                         continue;
                 }
 
