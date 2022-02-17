@@ -26,6 +26,9 @@ namespace asmdef2pu
         Vector2 _scroll;
         static readonly string _urlPlantuml = "https://plantuml.com/plantuml/uml/";
         static readonly float _oneLineHeight = 20f;
+        bool _bShowStyleOptions = true;
+        bool _bShowTargetOptions = true;
+        bool _bShowDependencyOptions = true;
 
         [SerializeField]
         private List<string> _excludeDirectoryPattern = new() { "Assets/Plugins" };
@@ -42,44 +45,59 @@ namespace asmdef2pu
         {
             // Style Options
             {
-                GUILayout.Label("Style Options", EditorStyles.boldLabel);
-                _options.bNestedNamespace = EditorGUILayout.ToggleLeft("Assembly 名のドット区切りで Namespace を作成", _options.bNestedNamespace);
+                _bShowStyleOptions = EditorGUILayout.BeginFoldoutHeaderGroup(_bShowStyleOptions, "Style Options");
+                if (_bShowStyleOptions)
+                {
+                    using (new EditorGUI.IndentLevelScope(1))
+                    {
+                        _options.bNestedNamespace = EditorGUILayout.ToggleLeft("Assembly 名のドット区切りで Namespace を作成", _options.bNestedNamespace);
+                    }
+                }
+                EditorGUILayout.EndFoldoutHeaderGroup();
             }
-
-            GUILayout.Space(_oneLineHeight);
 
             // Target Options
             {
-                var targetOptions = _options.TargetAssemblyOptions;
-                GUILayout.Label("Target Options", EditorStyles.boldLabel);
-                targetOptions.bIgnorePackageAssembly = EditorGUILayout.ToggleLeft("Package/ 以下の Assembly は除外", targetOptions.bIgnorePackageAssembly);
-                targetOptions.bIgnoreUnityAssembly = EditorGUILayout.ToggleLeft("Unity の Assembly は除外", targetOptions.bIgnoreUnityAssembly);
-                targetOptions.bIgnoreAssemblyCSharp = EditorGUILayout.ToggleLeft("Assembly-CSharp は除外", targetOptions.bIgnoreAssemblyCSharp);
+                _bShowTargetOptions = EditorGUILayout.BeginFoldoutHeaderGroup(_bShowTargetOptions, "Target Options");
+                if (_bShowTargetOptions)
+                {
+                    using (new EditorGUI.IndentLevelScope(1))
+                    {
+                        var targetOptions = _options.TargetAssemblyOptions;
+                        targetOptions.bIgnorePackageAssembly = EditorGUILayout.ToggleLeft("Package/ 以下の Assembly は除外", targetOptions.bIgnorePackageAssembly);
+                        targetOptions.bIgnoreUnityAssembly = EditorGUILayout.ToggleLeft("Unity の Assembly は除外", targetOptions.bIgnoreUnityAssembly);
+                        targetOptions.bIgnoreAssemblyCSharp = EditorGUILayout.ToggleLeft("Assembly-CSharp は除外", targetOptions.bIgnoreAssemblyCSharp);
+                    }
+                }
+                EditorGUILayout.EndFoldoutHeaderGroup();
 
                 // 除外リスト
                 {
                     ThisSerializedObject.Update();
                     var property = ThisSerializedObject.FindProperty(nameof(_excludeDirectoryPattern));
-                    EditorGUILayout.PropertyField(property: property, label: new GUIContent("無視するディレクトリのリスト"), includeChildren: true);
+                    EditorGUILayout.PropertyField(property: property, label: new GUIContent("Exclude .asmdef directory regex patterns"), includeChildren: true);
                     ThisSerializedObject.ApplyModifiedProperties();
                 }
             }
 
-            GUILayout.Space(_oneLineHeight);
-
             // Dependency Options
             {
-
-                GUILayout.Label("Dependency Options", EditorStyles.boldLabel);
-                _options.bIgnoreUnityAssemblyDependency = EditorGUILayout.ToggleLeft("Unity の Assembly は依存元から除く", _options.bIgnoreUnityAssemblyDependency);
-                _options.bIgnoreUnityEngineUiDependency = EditorGUILayout.ToggleLeft("UnityEngine.UI への依存は注釈にする", _options.bIgnoreUnityEngineUiDependency);
-
+                _bShowDependencyOptions = EditorGUILayout.BeginFoldoutHeaderGroup(_bShowDependencyOptions, "Dependency Options");
+                if (_bShowDependencyOptions)
+                {
+                    using (new EditorGUI.IndentLevelScope(1))
+                    {
+                        _options.bIgnoreUnityAssemblyDependency = EditorGUILayout.ToggleLeft("Unity の Assembly は依存元から除く", _options.bIgnoreUnityAssemblyDependency);
+                        _options.bIgnoreUnityEngineUiDependency = EditorGUILayout.ToggleLeft("UnityEngine.UI への依存は注釈にする", _options.bIgnoreUnityEngineUiDependency);
+                    }
+                }
+                EditorGUILayout.EndFoldoutHeaderGroup();
             }
 
             GUILayout.Space(_oneLineHeight);
 
             // Draw Generate Button
-            if (GUILayout.Button("Generate PlantUML Text"))
+            if (GUILayout.Button("Generate PlantUML", GUILayout.Height(_oneLineHeight * 2))) // x2 larger
             {
                 _options.TargetAssemblyOptions.ignoreDirectoryPatterns = this._excludeDirectoryPattern;
                 _textResultPlantUml = Generator.Generate(_options);
@@ -90,7 +108,7 @@ namespace asmdef2pu
             {
                 _scroll = s.scrollPosition;
                 // Readonly TextArea hack
-                EditorGUILayout.SelectableLabel(_textResultPlantUml, EditorStyles.textArea, GUILayout.Height(position.height - 350));
+                EditorGUILayout.SelectableLabel(_textResultPlantUml, EditorStyles.textArea, GUILayout.Height(position.height));
             }
 
             // Copy Text Button
