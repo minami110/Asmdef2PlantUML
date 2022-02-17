@@ -103,7 +103,7 @@ namespace asmdef2pu
         internal static string Generate(ExportOptions options)
         {
             // Make Drawer
-            var drawer = new ComponentDrawer();
+            var drawer = new PlantUmlDrawer();
 
             // Gather Unity Assemblies
             // Player Build included only (Excluded test assembly)

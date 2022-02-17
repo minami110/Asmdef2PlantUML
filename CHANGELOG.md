@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.2] - 2022-02-18
+
+- (Editor) Exclude Assembly-CSharp option default to false
+- (PlantUML) Fix Assembly-CSharp exporting error
+
 ## [0.2.1] - 2022-02-17
 
 - (Editor) Added options
