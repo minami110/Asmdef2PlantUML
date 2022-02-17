@@ -119,7 +119,10 @@ namespace asmdef2pu
 
             // To PlantUml
             string output = "";
-            output += "@startuml\n\n";
+            output += "@startuml\n";
+            output += "skinparam componentStyle uml1\n";
+            output += "skinparam linetype ortho\n";
+            output += "\n";
 
             // Package Defines
             if (options.bNestedNamespace)
@@ -136,6 +139,7 @@ namespace asmdef2pu
             }
 
             // Assembly Defines
+            /*
             {
                 output += "' ----- Begin Assembly -----\n\n";
                 foreach (var pua in puAssemblies)
@@ -145,6 +149,7 @@ namespace asmdef2pu
                 }
                 output += "\n' ----- End Assembly -----\n\n";
             }
+            */
 
             // Dependency Defines
             {
