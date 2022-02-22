@@ -36,7 +36,7 @@ namespace asmdef2pu
         [SerializeField]
         private StyleOptions _styleOptions = new();
 
-        [MenuItem("Tools/Asmdef2PlantUML")]
+        [MenuItem("Tools/Asmdef2PlantUML/Create Assembly Dependencies")]
         private static void ShowWindow()
         {
             var window = EditorWindow.GetWindow<Asmdef2PlantUmlWindow>(title: "Asmdef2PlantUML");
