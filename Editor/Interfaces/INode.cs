@@ -28,6 +28,5 @@ namespace asmdef2pu.Interfaces
         }
         #endregion
 
-
     }
 }

@@ -70,9 +70,9 @@ namespace asmdef2pu
                     using (new EditorGUI.IndentLevelScope(1))
                     {
                         var targetOptions = _options.TargetAssemblyOptions;
-                        targetOptions.bIgnorePackageAssembly = EditorGUILayout.ToggleLeft("Package/ 以下の Assembly は除外", targetOptions.bIgnorePackageAssembly);
-                        targetOptions.bIgnoreUnityAssembly = EditorGUILayout.ToggleLeft("Unity の Assembly は除外", targetOptions.bIgnoreUnityAssembly);
-                        targetOptions.bIgnoreAssemblyCSharp = EditorGUILayout.ToggleLeft("Assembly-CSharp は除外", targetOptions.bIgnoreAssemblyCSharp);
+                        targetOptions.bIgnorePackageAssembly = EditorGUILayout.ToggleLeft("Exclude assemblies in Packages/*", targetOptions.bIgnorePackageAssembly);
+                        targetOptions.bIgnoreUnityAssembly = EditorGUILayout.ToggleLeft("Exclude assemblies of Unity", targetOptions.bIgnoreUnityAssembly);
+                        targetOptions.bIgnoreAssemblyCSharp = EditorGUILayout.ToggleLeft("Exclude Assembly-CSharp.dll", targetOptions.bIgnoreAssemblyCSharp);
                     }
                 }
                 EditorGUILayout.EndFoldoutHeaderGroup();
@@ -93,8 +93,8 @@ namespace asmdef2pu
                 {
                     using (new EditorGUI.IndentLevelScope(1))
                     {
-                        _options.bIgnorePackageAssemblyDependency = EditorGUILayout.ToggleLeft("Package/ 以下のの Assembly は依存先から除外", _options.bIgnorePackageAssemblyDependency);
-                        _options.bIgnoreUnityAssemblyDependency = EditorGUILayout.ToggleLeft("Unity の Assembly は依存先から除外", _options.bIgnoreUnityAssemblyDependency);
+                        _options.bIgnorePackageAssemblyDependency = EditorGUILayout.ToggleLeft("Exclude assemblies in Packages/*", _options.bIgnorePackageAssemblyDependency);
+                        _options.bIgnoreUnityAssemblyDependency = EditorGUILayout.ToggleLeft("Exclude assemblies of Unity", _options.bIgnoreUnityAssemblyDependency);
                         _options.bHideUnityEngineDependency = EditorGUILayout.ToggleLeft("UnityEngine.UI への依存は注釈にする", _options.bHideUnityEngineDependency);
                     }
                 }

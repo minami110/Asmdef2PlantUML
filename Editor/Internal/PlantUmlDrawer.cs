@@ -37,6 +37,7 @@ namespace asmdef2pu.Internal
         private IAssembly CreateOrGetAssembly(string name, string filePath, bool isDependentUnityEngine)
         {
             // Split Names
+            // Foo => {"Foo"}
             // Foo.Bar.Baz => {"Foo", "Bar", "Baz"}
             var sep = ".";
             var sepName = name.Split(sep);
