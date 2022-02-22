@@ -108,7 +108,10 @@ namespace asmdef2pu
                         {
                             plantUmlStr += "\n" + $"abstract {className}" + " {";
                         }
-                        plantUmlStr += "\n" + $"class {className}" + " {";
+                        else
+                        {
+                            plantUmlStr += "\n" + $"class {className}" + " {";
+                        }
                     }
 
                     // この型の中で 実装された メソッドの一覧を取得する
@@ -152,14 +155,22 @@ namespace asmdef2pu
                     // クラスが実装しているインタフェースの一覧
                     foreach (Type typeInterface in typeClass.GetInterfaces())
                     {
-                        if (typeInterface.IsGenericType)
+                        // Enum のばあい, 絶対に依存するInterface があるので取り除く
+                        if (typeClass.IsEnum)
                         {
-
+                            // なにもしない
                         }
                         else
                         {
-                            var interfaceName = typeInterface.ToString();
-                            dependenciesStrList.Add($"\"{interfaceName}\" <|.. \"{className}\"");
+                            if (typeInterface.IsGenericType)
+                            {
+                                // なにもしない
+                            }
+                            else
+                            {
+                                var interfaceName = typeInterface.ToString();
+                                dependenciesStrList.Add($"\"{interfaceName}\" <|.. \"{className}\"");
+                            }
                         }
                     };
                 }
