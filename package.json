@@ -1,12 +1,12 @@
 {
-    "name": "com.minami110.asmdef2plantuml",
-    "description": "Unity .asmdef dependency PlantUML graph generator",
-    "version": "0.2.2",
-    "displayName": "Asmdef2PlantUML",
-    "unity": "2021.2",
-    "author": {
-        "name": "Minami Tomonobu",
-        "email": "minami@edanoue.com",
-        "url": "https://edanoue.com"
-    }
+  "name": "com.minami110.asmdef2plantuml",
+  "description": "Unity .asmdef dependency PlantUML graph generator",
+  "version": "0.3.0-pre",
+  "displayName": "Asmdef2PlantUML",
+  "unity": "2021.2",
+  "author": {
+    "name": "Minami Tomonobu",
+    "email": "minami@edanoue.com",
+    "url": "https://edanoue.com"
+  }
 }
